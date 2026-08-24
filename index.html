@@ -120,7 +120,6 @@
 
     <div class="w-full max-w-4xl bg-white rounded-3xl p-6 md:p-12 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.05)] border border-slate-100 relative z-10" id="app-container">
         
-        <!-- Уведомление о конфиденциальности -->
         <div class="text-xs text-slate-400 flex items-center gap-2 mb-10 justify-center font-medium bg-slate-50 py-2 px-4 rounded-full max-w-max mx-auto border border-slate-100">
             <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
             Данные обрабатываются локально. Строгая конфиденциальность.
@@ -175,7 +174,6 @@
 
                 </div>
                 
-                <!-- Калькулятор визуализации скрытых потерь -->
                 <div id="loss-estimator" class="loss-panel bg-red-50 border border-red-100 rounded-2xl p-6 flex flex-col md:flex-row items-center justify-between gap-4 shadow-inner">
                     <div>
                         <div class="flex items-center gap-2 text-red-600 mb-1">
@@ -290,36 +288,16 @@
 
     <script>
         // ==========================================
-        // НАСТРОЙКИ УВЕДОМЛЕНИЙ (ВСТАВЬТЕ СВОИ КЛЮЧИ ЗДЕСЬ)
+        // НАСТРОЙКА УВЕДОМЛЕНИЙ НА ПОЧТУ
         // ==========================================
-        const WEB3FORMS_ACCESS_KEY = ' f3aaee45-5897-4b1e-b06a-e00d29bb44ba'; 
-        const TELEGRAM_BOT_TOKEN = ' 8580404849:AAH3Q39jWp5_pVv6F01Wb0XXmSv1XJ4RV_E
-'; 
-        const TELEGRAM_CHAT_ID = '1086989110'; 
+        // Вставьте сюда ваш Access Key от Web3Forms
+        const WEB3FORMS_ACCESS_KEY = 'ВАШ_КЛЮЧ_WEB3FORMS'; 
         // ==========================================
 
-        const state = {
-            revenueIndex: 0,
-            pains: [],
-            trust: null,
-            painNames: []
-        };
-
-        const revenueLabels = {
-            0: "до 50 млн ₽",
-            1: "50–200 млн ₽",
-            2: "200–500 млн ₽",
-            3: "более 500 млн ₽"
-        };
-        
+        const state = { revenueIndex: 0, pains: [], trust: null, painNames: [] };
+        const revenueLabels = { 0: "до 50 млн ₽", 1: "50–200 млн ₽", 2: "200–500 млн ₽", 3: "более 500 млн ₽" };
         const revenueBaseMap = { 0: 30, 1: 125, 2: 350, 3: 750 };
-
-        const painMultipliers = {
-            'cashgap': 0.08,
-            'profit_drop': 0.05,
-            'hidden_loss': 0.06,
-            'scale_illusion': 0.04
-        };
+        const painMultipliers = { 'cashgap': 0.08, 'profit_drop': 0.05, 'hidden_loss': 0.06, 'scale_illusion': 0.04 };
 
         const elSlider = document.getElementById('revenue-slider');
         const elRevenueDisplay = document.getElementById('revenue-display');
@@ -340,9 +318,7 @@
                 const progress = Math.min((timestamp - startTimestamp) / duration, 1);
                 const easeOut = 1 - Math.pow(1 - progress, 3);
                 const currentVal = Math.floor(easeOut * (end - start) + start);
-                
                 obj.innerHTML = currentVal.toLocaleString('ru-RU');
-                
                 if (progress < 1) window.requestAnimationFrame(step);
             };
             window.requestAnimationFrame(step);
@@ -353,15 +329,10 @@
                 elLossEstimator.classList.remove('visible');
                 return;
             }
-            
             elLossEstimator.classList.add('visible');
             const baseRevenue = revenueBaseMap[state.revenueIndex] * 1000000; 
             let totalMultiplier = 0;
-            
-            state.pains.forEach(pain => {
-                totalMultiplier += painMultipliers[pain];
-            });
-            
+            state.pains.forEach(pain => { totalMultiplier += painMultipliers[pain]; });
             const estimatedLoss = baseRevenue * totalMultiplier;
             animateValue(elLossAmount, 0, estimatedLoss, 1000);
         };
@@ -387,12 +358,8 @@
                     state.painNames.push(name);
                     target.classList.add('active');
                 }
-                
                 calculateLosses(); 
-                
-                if (state.pains.length > 0) {
-                    document.getElementById('pain-error').classList.add('hidden');
-                }
+                if (state.pains.length > 0) document.getElementById('pain-error').classList.add('hidden');
             });
         });
 
@@ -419,16 +386,13 @@
             let recommendedProduct = "";
             let description = "";
 
-            // Динамический заголовок с вставкой ответов клиента
             let painText = state.painNames.length > 0 ? state.painNames[0].toLowerCase() : "финансовых проблем";
             elSubtitle.innerHTML = `Для компании с выручкой <b>${revenueLabels[state.revenueIndex]}</b> и проблемой: <b>${painText}</b>`;
 
-            // Логика приоритизации
             if (state.revenueIndex === 0 || state.revenueIndex === 1) { 
                 recommendedProduct = "Диагностика экономики бизнеса";
                 description = "Для бизнеса с вашим масштабом важно выстроить правильную архитектуру финансов. Я предлагаю начать с экспресс-диагностики, чтобы понять, целесообразно ли сейчас внедрять сложные инструменты или достаточно базовой настройки, чтобы не терять деньги.";
             } else { 
-                // Если разрывы выбраны вместе с чем-то еще - они всегда в приоритете
                 if (state.pains.includes('cashgap')) {
                     recommendedProduct = "Финансовая стабилизация бизнеса";
                     description = "Регулярные кассовые разрывы на ваших оборотах критичны. Нам необходимо построить краткосрочный денежный прогноз, определить источники разрывов и реализовать план по быстрому высвобождению замороженных средств.";
@@ -441,7 +405,6 @@
                 }
             }
 
-            // Подбор кейса
             if (state.pains.includes('cashgap')) {
                 elCaseTitle.textContent = "Разморозка денег из запасов";
                 elCaseDesc.textContent = "Анализ показал, что план производства систематически превышал фактический спрос. Мы скорректировали выпуск и остановили заморозку оборотных средств на складах.";
@@ -507,59 +470,34 @@
             }
         });
 
-        // СКРИПТЫ ДЛЯ МАСКИ ТЕЛЕФОНА
+        // Логика маски для телефона
         const phoneInput = document.getElementById('form-phone');
-
-        const getInputNumbersValue = (input) => {
-            return input.value.replace(/\D/g, '');
-        }
+        const getInputNumbersValue = (input) => input.value.replace(/\D/g, '');
 
         const onPhonePaste = (e) => {
-            let input = e.target,
-                inputNumbersValue = getInputNumbersValue(input);
+            let input = e.target, inputNumbersValue = getInputNumbersValue(input);
             let pasted = e.clipboardData || window.clipboardData;
             if (pasted) {
                 let pastedText = pasted.getData('Text');
-                if (/\D/g.test(pastedText)) {
-                    input.value = inputNumbersValue;
-                    return;
-                }
+                if (/\D/g.test(pastedText)) { input.value = inputNumbersValue; return; }
             }
         }
 
         const onPhoneInput = (e) => {
-            let input = e.target,
-                inputNumbersValue = getInputNumbersValue(input),
-                selectionStart = input.selectionStart,
-                formattedInputValue = "";
-
-            if (!inputNumbersValue) {
-                return input.value = "";
-            }
-
+            let input = e.target, inputNumbersValue = getInputNumbersValue(input), selectionStart = input.selectionStart, formattedInputValue = "";
+            if (!inputNumbersValue) return input.value = "";
             if (input.value.length != selectionStart) {
-                if (e.data && /\D/g.test(e.data)) {
-                    input.value = inputNumbersValue;
-                }
+                if (e.data && /\D/g.test(e.data)) input.value = inputNumbersValue;
                 return;
             }
-
             if (["7", "8", "9"].indexOf(inputNumbersValue[0]) > -1) {
                 if (inputNumbersValue[0] == "9") inputNumbersValue = "7" + inputNumbersValue;
                 let firstSymbols = (inputNumbersValue[0] == "8") ? "8" : "+7";
                 formattedInputValue = input.value = firstSymbols + " ";
-                if (inputNumbersValue.length > 1) {
-                    formattedInputValue += '(' + inputNumbersValue.substring(1, 4);
-                }
-                if (inputNumbersValue.length >= 5) {
-                    formattedInputValue += ') ' + inputNumbersValue.substring(4, 7);
-                }
-                if (inputNumbersValue.length >= 8) {
-                    formattedInputValue += '-' + inputNumbersValue.substring(7, 9);
-                }
-                if (inputNumbersValue.length >= 10) {
-                    formattedInputValue += '-' + inputNumbersValue.substring(9, 11);
-                }
+                if (inputNumbersValue.length > 1) formattedInputValue += '(' + inputNumbersValue.substring(1, 4);
+                if (inputNumbersValue.length >= 5) formattedInputValue += ') ' + inputNumbersValue.substring(4, 7);
+                if (inputNumbersValue.length >= 8) formattedInputValue += '-' + inputNumbersValue.substring(7, 9);
+                if (inputNumbersValue.length >= 10) formattedInputValue += '-' + inputNumbersValue.substring(9, 11);
             } else {
                 formattedInputValue = '+' + inputNumbersValue.substring(0, 16);
             }
@@ -568,16 +506,14 @@
         
         const onPhoneKeyDown = (e) => {
             let inputValue = e.target.value.replace(/\D/g, '');
-            if (e.keyCode == 8 && inputValue.length == 1) {
-                e.target.value = "";
-            }
+            if (e.keyCode == 8 && inputValue.length == 1) e.target.value = "";
         }
 
         phoneInput.addEventListener('keydown', onPhoneKeyDown);
         phoneInput.addEventListener('input', onPhoneInput, false);
         phoneInput.addEventListener('paste', onPhonePaste, false);
 
-        // ОБРАБОТКА ОТПРАВКИ ФОРМЫ (Web3Forms + Telegram)
+        // Отправка формы (только на почту через Web3Forms)
         document.getElementById('btn-submit').addEventListener('click', async () => {
             const name = document.getElementById('form-name').value.trim();
             const phone = document.getElementById('form-phone').value.trim();
@@ -597,12 +533,10 @@
                 errorEl.classList.add('hidden');
             }
 
-            // Показываем загрузку на кнопке
             btnText.textContent = "Отправка...";
             btnLoader.classList.remove('hidden');
             document.getElementById('btn-submit').disabled = true;
             
-            // Формируем текст заявки
             const leadMessage = `🔥 Новая заявка на диагностику CFO!\n\n` +
                                 `👤 Имя: ${name}\n` +
                                 `📞 Телефон: ${phone}\n` +
@@ -611,52 +545,35 @@
                                 `🚨 Боли: ${state.painNames.join(', ')}\n` +
                                 `⭐ Доверие к отчетам: ${state.trust}/5`;
 
-            // Массив промисов для параллельной отправки
-            const requests = [];
-
-            // 1. Отправка в Telegram
-            if (TELEGRAM_BOT_TOKEN !== 'ВАШ_ТОКЕН_БОТА') {
-                const tgUrl = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
-                const tgReq = fetch(tgUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ chat_id: TELEGRAM_CHAT_ID, text: leadMessage })
-                }).catch(e => console.error('TG Error:', e));
-                requests.push(tgReq);
-            }
-
-            // 2. Отправка на почту (Web3Forms)
-            if (WEB3FORMS_ACCESS_KEY !== 'ВАШ_КЛЮЧ_WEB3FORMS') {
-                const mailReq = fetch('https://api.web3forms.com/submit', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-                    body: JSON.stringify({
-                        access_key: WEB3FORMS_ACCESS_KEY,
-                        subject: 'Новая заявка с интерактивного КП CFO',
-                        from_name: 'Интерактивное КП',
-                        name: name,
-                        email: email, 
-                        phone: phone,
-                        message: leadMessage
-                    })
-                }).catch(e => console.error('Mail Error:', e));
-                requests.push(mailReq);
-            }
-
-            // Ждем завершения всех отправок (или таймаут 2 сек для надежности)
-            if(requests.length > 0) {
-                await Promise.all(requests);
+            // Отправка через Web3Forms
+            if (WEB3FORMS_ACCESS_KEY && WEB3FORMS_ACCESS_KEY !== 'f3aaee45-5897-4b1e-b06a-e00d29bb44ba') {
+                try {
+                    await fetch('https://api.web3forms.com/submit', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                        body: JSON.stringify({
+                            access_key: WEB3FORMS_ACCESS_KEY,
+                            subject: 'Новая заявка с интерактивного КП CFO',
+                            from_name: 'Интерактивное КП',
+                            name: name,
+                            email: email, 
+                            phone: phone,
+                            message: leadMessage
+                        })
+                    });
+                } catch(e) {
+                    console.error('Ошибка отправки:', e);
+                }
             } else {
-                // Если ключи не вставлены, просто эмулируем задержку
+                // Если ключ не вставлен, просто имитируем загрузку для проверки интерфейса
+                console.warn("Внимание: Ключ Web3Forms не указан, отправка на почту не сработала. Имитация задержки...");
                 await new Promise(r => setTimeout(r, 1000));
             }
             
-            // Переход на экран успеха
             scrResult.classList.add('hidden-screen');
             scrSuccess.classList.remove('hidden-screen');
             window.scrollTo({ top: 0, behavior: 'smooth' });
             
-            // Сбрасываем кнопку на всякий случай
             btnText.textContent = "Забронировать время в календаре";
             btnLoader.classList.add('hidden');
             document.getElementById('btn-submit').disabled = false;
