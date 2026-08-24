@@ -286,6 +286,39 @@
 
     </div>
 
+    <div id="magnet-modal" class="hidden fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 opacity-0 transition-opacity duration-300">
+        <div class="bg-white rounded-2xl p-6 md:p-8 max-w-md w-full shadow-2xl transform scale-95 transition-transform duration-300" id="magnet-modal-content">
+            <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mb-4">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+            </div>
+            <h3 class="text-2xl font-bold text-slate-900 mb-2">Получить чек-лист</h3>
+            <p class="text-slate-600 mb-6 text-sm">Укажите ваш email. Мы сохраним его и пришлем PDF-файл «5 признаков кассового разрыва».</p>
+            
+            <input type="email" id="magnet-email" placeholder="Ваш email" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-5 py-4 text-slate-900 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all mb-2">
+            <p id="magnet-error" class="text-red-500 text-xs hidden mb-4 font-medium pl-1">Пожалуйста, введите корректный email</p>
+            
+            <button id="btn-send-magnet" class="w-full btn-primary font-bold py-4 rounded-xl mt-3 text-base flex justify-center items-center gap-2 relative">
+                <span id="btn-magnet-text">Отправить мне файл</span>
+                <div id="btn-magnet-loader" class="hidden absolute right-6 w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+            </button>
+            <button id="btn-close-magnet" class="mt-4 w-full text-center text-sm text-slate-400 hover:text-slate-600 font-medium py-2">Отмена</button>
+        </div>
+        
+        <div id="magnet-success" class="hidden bg-white rounded-2xl p-6 md:p-8 max-w-md w-full shadow-2xl text-center">
+            <div class="w-16 h-16 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+            </div>
+            <h3 class="text-2xl font-bold text-slate-900 mb-2">Email получен!</h3>
+            <p class="text-slate-600 mb-6 text-sm">Чек-лист готов к загрузке. Нажмите на кнопку ниже, чтобы сохранить файл:</p>
+            
+            <!-- Вот здесь я уже вставил правильную ссылку на скачивание checklist.pdf -->
+            <a href="./checklist.pdf" download="Чек-лист.pdf" id="magnet-download-link" class="block w-full bg-blue-50 hover:bg-blue-100 text-blue-700 font-bold py-4 rounded-xl transition-colors mb-3 border border-blue-200">
+                📥 Скачать PDF сейчас
+            </a>
+            <button id="btn-close-success" class="w-full text-sm text-slate-400 hover:text-slate-600 font-medium py-2 mt-2">Закрыть окно</button>
+        </div>
+    </div>
+
     <script>
         const state = { revenueIndex: 0, pains: [], trust: null, painNames: [] };
         const revenueLabels = { 0: "до 50 млн ₽", 1: "50–200 млн ₽", 2: "200–500 млн ₽", 3: "более 500 млн ₽" };
@@ -456,11 +489,83 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         });
         
+        const magnetModal = document.getElementById('magnet-modal');
+        const magnetModalContent = document.getElementById('magnet-modal-content');
+        const magnetSuccess = document.getElementById('magnet-success');
+
         document.getElementById('btn-magnet').addEventListener('click', () => {
-            const email = prompt("Укажите ваш email, и мы сразу отправим чек-лист:");
-            if(email && email.includes('@')) {
-                alert("Чек-лист успешно отправлен на " + email);
+            magnetModal.classList.remove('hidden');
+            setTimeout(() => {
+                magnetModal.classList.remove('opacity-0');
+                magnetModalContent.classList.remove('scale-95');
+            }, 10);
+        });
+
+        const closeMagnetModal = () => {
+            magnetModal.classList.add('opacity-0');
+            magnetModalContent.classList.add('scale-95');
+            setTimeout(() => {
+                magnetModal.classList.add('hidden');
+                magnetSuccess.classList.add('hidden');
+                magnetModalContent.classList.remove('hidden');
+                document.getElementById('magnet-email').value = '';
+            }, 300);
+        }
+
+        document.getElementById('btn-close-magnet').addEventListener('click', closeMagnetModal);
+        document.getElementById('btn-close-success').addEventListener('click', closeMagnetModal);
+
+        document.getElementById('btn-send-magnet').addEventListener('click', async () => {
+            const email = document.getElementById('magnet-email').value.trim();
+            const errorEl = document.getElementById('magnet-error');
+            const btnText = document.getElementById('btn-magnet-text');
+            const btnLoader = document.getElementById('btn-magnet-loader');
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+            if(!emailRegex.test(email)) {
+                errorEl.classList.remove('hidden');
+                return;
             }
+            errorEl.classList.add('hidden');
+
+            btnText.textContent = "Отправка...";
+            btnLoader.classList.remove('hidden');
+            document.getElementById('btn-send-magnet').disabled = true;
+
+            const leadMessage = `🎁 ЗАПРОС ЧЕК-ЛИСТА!\n\nEmail: ${email}\nПользователь не готов к встрече, но запросил чек-лист.\nКонтакт сохранен.`;
+
+            // ==========================================
+            // КЛЮЧ УЖЕ ВСТАВЛЕН ЗДЕСЬ
+            // ==========================================
+            const WEB3FORMS_ACCESS_KEY = 'f3aaee45-5897-4b1e-b06a-e00d29bb44ba';
+            
+            const isKeyValid = WEB3FORMS_ACCESS_KEY && 
+                               WEB3FORMS_ACCESS_KEY.length > 20 && 
+                               WEB3FORMS_ACCESS_KEY !== 'ВАШ_КЛЮЧ_WEB3FORMS';
+
+            if (isKeyValid) {
+                try {
+                    await fetch('https://api.web3forms.com/submit', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                        body: JSON.stringify({
+                            access_key: WEB3FORMS_ACCESS_KEY,
+                            subject: '🎁 Запрос чек-листа с КП',
+                            from_name: 'Лид-магнит',
+                            email: email,
+                            message: leadMessage
+                        })
+                    });
+                } catch(e) { console.error('Ошибка:', e); }
+            }
+
+            // Показываем экран успешной отправки со ссылкой на скачивание
+            btnText.textContent = "Отправить мне файл";
+            btnLoader.classList.add('hidden');
+            document.getElementById('btn-send-magnet').disabled = false;
+
+            magnetModalContent.classList.add('hidden');
+            magnetSuccess.classList.remove('hidden');
         });
 
         const phoneInput = document.getElementById('form-phone');
@@ -537,11 +642,15 @@
                                 `⭐ Доверие к отчетам: ${state.trust}/5`;
 
             // ==========================================
-            // ЗДЕСЬ УЖЕ ВСТАВЛЕН ВАШ КЛЮЧ ОТ WEB3FORMS:
+            // И ЗДЕСЬ КЛЮЧ ТОЖЕ ВСТАВЛЕН
             // ==========================================
             const WEB3FORMS_ACCESS_KEY = 'f3aaee45-5897-4b1e-b06a-e00d29bb44ba';
             
-            if (WEB3FORMS_ACCESS_KEY && WEB3FORMS_ACCESS_KEY.length > 20) {
+            const isKeyValid = WEB3FORMS_ACCESS_KEY && 
+                               WEB3FORMS_ACCESS_KEY.length > 20 && 
+                               WEB3FORMS_ACCESS_KEY !== 'ВАШ_КЛЮЧ_WEB3FORMS';
+            
+            if (isKeyValid) {
                 try {
                     await fetch('https://api.web3forms.com/submit', {
                         method: 'POST',
@@ -559,8 +668,6 @@
                 } catch(e) {
                     console.error('Ошибка отправки:', e);
                 }
-            } else {
-                console.warn("Внимание: Ключ не вставлен, отправка не удалась.");
             }
             
             scrResult.classList.add('hidden-screen');
