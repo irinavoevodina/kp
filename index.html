@@ -10,7 +10,7 @@
         :root {
             --primary-dark: #1e3a8a; 
             --primary-light: #2563eb; 
-            --bg-color: #f8fafc; 
+            --bg-color: #ffffff; 
             --card-bg: #ffffff;
             --text-main: #0f172a;
         }
@@ -130,7 +130,7 @@
             <h1 class="text-3xl md:text-5xl font-bold text-center mb-5 text-slate-900 tracking-tight">Нахожу причины потери прибыли, а не <span class="text-blue-600">просто свожу отчеты</span></h1>
             <p class="text-slate-500 text-center mb-12 text-base md:text-lg max-w-2xl mx-auto">Ответьте на 3 вопроса о вашем бизнесе, чтобы система определила точки потери денег и перестроила решение под вашу задачу.</p>
 
-            <div class="mb-12 bg-white border border-slate-200 p-6 rounded-2xl shadow-sm">
+            <div class="mb-12 bg-white border border-slate-200 p-6 md:p-8 rounded-2xl shadow-sm hover:shadow-md transition-shadow">
                 <div class="flex justify-between items-end mb-6">
                     <h2 class="text-xl font-bold text-slate-800">1. Годовая выручка компании</h2>
                     <span id="revenue-display" class="text-blue-700 font-bold text-xl bg-blue-50 px-3 py-1 rounded-lg">до 50 млн ₽</span>
@@ -138,10 +138,10 @@
                 <div class="px-2">
                     <input type="range" id="revenue-slider" min="0" max="3" value="0" step="1">
                     <div class="flex justify-between text-xs md:text-sm text-slate-400 mt-3 font-medium">
-                        <span class="w-1/4 text-left">Старт</span>
-                        <span class="w-1/4 text-center">Рост</span>
-                        <span class="w-1/4 text-center">Масштаб</span>
-                        <span class="w-1/4 text-right">Корпорация</span>
+                        <span class="w-1/4 text-left">до 50 млн</span>
+                        <span class="w-1/4 text-center">50-200 млн</span>
+                        <span class="w-1/4 text-center">200-500 млн</span>
+                        <span class="w-1/4 text-right">более 500 млн</span>
                     </div>
                 </div>
             </div>
@@ -149,7 +149,7 @@
             <div class="mb-12">
                 <div class="flex items-center gap-2 mb-6">
                     <h2 class="text-xl font-bold text-slate-800">2. Что сейчас происходит в бизнесе?</h2>
-                    <span class="text-xs bg-slate-100 text-slate-500 px-2 py-1 rounded">Можно несколько</span>
+                    <span class="text-xs bg-slate-100 text-slate-500 px-2 py-1 rounded">Можно выбрать несколько</span>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="pain-container">
                     
@@ -160,12 +160,12 @@
                     
                     <button class="pain-card text-left p-6 rounded-2xl flex flex-col h-full" data-val="profit_drop">
                         <div class="pain-title font-bold text-lg mb-2 text-slate-800">Снижение прибыли</div>
-                        <div class="text-sm text-slate-500 leading-relaxed">Объемы продаж увеличиваются, команда перегружена, однако финансовый результат на выходе разочаровывает. Рентабельность постепенно падает.</div>
+                        <div class="text-sm text-slate-500 leading-relaxed">Объемы продаж и выручка стабильно растут, команда перегружена, однако финансовый результат на выходе разочаровывает. Рентабельность падает.</div>
                     </button>
                     
                     <button class="pain-card text-left p-6 rounded-2xl flex flex-col h-full" data-val="hidden_loss">
                         <div class="pain-title font-bold text-lg mb-2 text-slate-800">Скрытая убыточность</div>
-                        <div class="text-sm text-slate-500 leading-relaxed">Нет четкого понимания себестоимости сделок. Отдельные проекты или неконтролируемые скидки незаметно высасывают деньги из компании.</div>
+                        <div class="text-sm text-slate-500 leading-relaxed">Нет четкого понимания реальной себестоимости. Отдельные проекты или неконтролируемые скидки от менеджеров незаметно высасывают деньги из компании.</div>
                     </button>
                     
                     <button class="pain-card text-left p-6 rounded-2xl flex flex-col h-full" data-val="scale_illusion">
@@ -192,7 +192,7 @@
                 <p id="pain-error" class="text-red-500 text-sm mt-3 hidden font-medium pl-2">Пожалуйста, выберите хотя бы одну проблему</p>
             </div>
 
-            <div class="mb-12 bg-white border border-slate-200 p-6 rounded-2xl shadow-sm">
+            <div class="mb-12 bg-white border border-slate-200 p-6 md:p-8 rounded-2xl shadow-sm hover:shadow-md transition-shadow">
                 <h2 class="text-xl font-bold text-slate-800 mb-4">3. Уровень доверия к текущим отчетам (1-5)</h2>
                 <div class="flex gap-3 text-4xl" id="trust-container">
                     <span class="trust-star" data-val="1">★</span>
@@ -237,7 +237,7 @@
             <div class="bg-white p-6 md:p-8 rounded-2xl border border-slate-200 shadow-lg relative overflow-hidden">
                 <div class="absolute top-0 right-0 w-32 h-32 bg-blue-50 rounded-bl-full -z-10"></div>
                 
-                <h3 class="text-2xl font-bold mb-3 text-slate-900">Бесплатная экспресс-диагностика</h3>
+                <h3 class="text-2xl font-bold mb-3 text-slate-900">Бесплатная диагностическая встреча</h3>
                 <p class="text-base text-slate-600 mb-6 leading-relaxed">По итогам 30-минутной видеовстречи вы получите <b>карту приоритетных рисков</b> и 2-3 гипотезы, где конкретно сейчас заморожены деньги вашей компании.</p>
                 
                 <div class="space-y-4">
@@ -248,11 +248,11 @@
                         <input type="email" id="form-email" placeholder="Электронная почта" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-5 py-4 text-slate-900 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all">
                     </div>
                     
-                    <p id="form-error" class="text-red-500 text-sm hidden font-medium pl-1">Пожалуйста, корректно заполните email и телефон</p>
+                    <p id="form-error" class="text-red-500 text-sm hidden font-medium pl-1">Пожалуйста, корректно заполните все поля</p>
                     
-                    <button id="btn-submit" class="w-full btn-primary font-bold py-4 rounded-xl mt-2 text-lg flex justify-center items-center gap-2">
-                        Забронировать время в календаре
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                    <button id="btn-submit" class="w-full btn-primary font-bold py-4 rounded-xl mt-2 text-lg flex justify-center items-center gap-2 relative">
+                        <span id="btn-submit-text">Забронировать время в календаре</span>
+                        <div id="btn-submit-loader" class="hidden absolute right-6 w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                     </button>
 
                     <p class="text-xs text-slate-400 text-center mt-3 leading-tight">
@@ -262,12 +262,13 @@
                     <div class="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-6 mt-5 text-xs font-medium text-slate-500">
                         <span class="flex items-center gap-1"><svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Встреча лично с Ириной Воеводиной</span>
                         <span class="flex items-center gap-1"><svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Без агрессивных продаж</span>
+                        <span class="flex items-center gap-1"><svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Строгая конфиденциальность (NDA)</span>
                     </div>
                 </div>
             </div>
             
             <button id="btn-magnet" class="mt-6 w-full text-center text-sm font-medium text-blue-600 hover:text-blue-800 underline transition-colors">
-                Пока не готовы к встрече? Получите чек-лист: «5 скрытых причин потери прибыли»
+                Пока не готовы к встрече? Получите чек-лист: «5 признаков, что ваша отчётность скрывает кассовый разрыв»
             </button>
             
             <button id="btn-back" class="mt-8 text-sm font-medium text-slate-400 hover:text-slate-600 transition-colors w-full text-center flex items-center justify-center gap-2">
@@ -277,17 +278,26 @@
         </div>
 
         <div id="screen-success" class="hidden-screen fade-in text-center py-16">
-            <div class="w-24 h-24 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-6 border-8 border-white shadow-sm">
-                <svg class="w-10 h-10 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+            <div class="w-24 h-24 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-6 border-8 border-white shadow-sm">
+                <svg class="w-10 h-10 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
             </div>
-            <h2 class="text-3xl font-bold mb-4 text-slate-900">Перенаправляем в календарь...</h2>
-            <p class="text-slate-600 text-lg mb-8 max-w-md mx-auto">Пожалуйста, выберите удобное время для онлайн-встречи на открывшейся странице виджета.</p>
-            <button class="btn-primary font-bold py-3 px-8 rounded-xl shadow-lg" onclick="alert('Демо: Здесь откроется виджет Calendly или Yandex Телемост')">Открыть календарь вручную</button>
+            <h2 class="text-3xl font-bold mb-4 text-slate-900">Заявка успешно отправлена!</h2>
+            <p class="text-slate-600 text-lg mb-8 max-w-md mx-auto">Я свяжусь с вами в ближайшее время. Если хотите сразу выбрать удобный слот, нажмите кнопку ниже.</p>
+            <button class="btn-primary font-bold py-3 px-8 rounded-xl shadow-lg" onclick="window.open('https://calendly.com/', '_blank')">Открыть календарь</button>
         </div>
 
     </div>
 
     <script>
+        // ==========================================
+        // НАСТРОЙКИ УВЕДОМЛЕНИЙ (ВСТАВЬТЕ СВОИ КЛЮЧИ ЗДЕСЬ)
+        // ==========================================
+        const WEB3FORMS_ACCESS_KEY = ' f3aaee45-5897-4b1e-b06a-e00d29bb44ba'; 
+        const TELEGRAM_BOT_TOKEN = ' 8580404849:AAH3Q39jWp5_pVv6F01Wb0XXmSv1XJ4RV_E
+'; 
+        const TELEGRAM_CHAT_ID = '1086989110'; 
+        // ==========================================
+
         const state = {
             revenueIndex: 0,
             pains: [],
@@ -331,7 +341,7 @@
                 const easeOut = 1 - Math.pow(1 - progress, 3);
                 const currentVal = Math.floor(easeOut * (end - start) + start);
                 
-                obj.innerHTML = "до " + currentVal.toLocaleString('ru-RU');
+                obj.innerHTML = currentVal.toLocaleString('ru-RU');
                 
                 if (progress < 1) window.requestAnimationFrame(step);
             };
@@ -366,7 +376,7 @@
             btn.addEventListener('click', (e) => {
                 const target = e.currentTarget; 
                 const val = target.dataset.val;
-                const name = target.querySelector('.pain-title').textContent.toLowerCase();
+                const name = target.querySelector('.pain-title').textContent;
                 
                 if (state.pains.includes(val)) {
                     state.pains = state.pains.filter(p => p !== val);
@@ -409,13 +419,16 @@
             let recommendedProduct = "";
             let description = "";
 
-            let painText = state.painNames.length > 0 ? state.painNames[0] : "финансовых проблем";
-            elSubtitle.textContent = `Для бизнеса с выручкой ${revenueLabels[state.revenueIndex]} и проблемой: ${painText}`;
+            // Динамический заголовок с вставкой ответов клиента
+            let painText = state.painNames.length > 0 ? state.painNames[0].toLowerCase() : "финансовых проблем";
+            elSubtitle.innerHTML = `Для компании с выручкой <b>${revenueLabels[state.revenueIndex]}</b> и проблемой: <b>${painText}</b>`;
 
+            // Логика приоритизации
             if (state.revenueIndex === 0 || state.revenueIndex === 1) { 
                 recommendedProduct = "Диагностика экономики бизнеса";
                 description = "Для бизнеса с вашим масштабом важно выстроить правильную архитектуру финансов. Я предлагаю начать с экспресс-диагностики, чтобы понять, целесообразно ли сейчас внедрять сложные инструменты или достаточно базовой настройки, чтобы не терять деньги.";
             } else { 
+                // Если разрывы выбраны вместе с чем-то еще - они всегда в приоритете
                 if (state.pains.includes('cashgap')) {
                     recommendedProduct = "Финансовая стабилизация бизнеса";
                     description = "Регулярные кассовые разрывы на ваших оборотах критичны. Нам необходимо построить краткосрочный денежный прогноз, определить источники разрывов и реализовать план по быстрому высвобождению замороженных средств.";
@@ -428,6 +441,7 @@
                 }
             }
 
+            // Подбор кейса
             if (state.pains.includes('cashgap')) {
                 elCaseTitle.textContent = "Разморозка денег из запасов";
                 elCaseDesc.textContent = "Анализ показал, что план производства систематически превышал фактический спрос. Мы скорректировали выпуск и остановили заморозку оборотных средств на складах.";
@@ -493,6 +507,7 @@
             }
         });
 
+        // СКРИПТЫ ДЛЯ МАСКИ ТЕЛЕФОНА
         const phoneInput = document.getElementById('form-phone');
 
         const getInputNumbersValue = (input) => {
@@ -562,11 +577,14 @@
         phoneInput.addEventListener('input', onPhoneInput, false);
         phoneInput.addEventListener('paste', onPhonePaste, false);
 
-        document.getElementById('btn-submit').addEventListener('click', () => {
+        // ОБРАБОТКА ОТПРАВКИ ФОРМЫ (Web3Forms + Telegram)
+        document.getElementById('btn-submit').addEventListener('click', async () => {
             const name = document.getElementById('form-name').value.trim();
             const phone = document.getElementById('form-phone').value.trim();
             const email = document.getElementById('form-email').value.trim();
             const errorEl = document.getElementById('form-error');
+            const btnText = document.getElementById('btn-submit-text');
+            const btnLoader = document.getElementById('btn-submit-loader');
             
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             const phoneClean = getInputNumbersValue(document.getElementById('form-phone'));
@@ -578,14 +596,70 @@
             } else {
                 errorEl.classList.add('hidden');
             }
+
+            // Показываем загрузку на кнопке
+            btnText.textContent = "Отправка...";
+            btnLoader.classList.remove('hidden');
+            document.getElementById('btn-submit').disabled = true;
             
+            // Формируем текст заявки
+            const leadMessage = `🔥 Новая заявка на диагностику CFO!\n\n` +
+                                `👤 Имя: ${name}\n` +
+                                `📞 Телефон: ${phone}\n` +
+                                `✉️ Email: ${email}\n\n` +
+                                `💰 Выручка: ${revenueLabels[state.revenueIndex]}\n` +
+                                `🚨 Боли: ${state.painNames.join(', ')}\n` +
+                                `⭐ Доверие к отчетам: ${state.trust}/5`;
+
+            // Массив промисов для параллельной отправки
+            const requests = [];
+
+            // 1. Отправка в Telegram
+            if (TELEGRAM_BOT_TOKEN !== 'ВАШ_ТОКЕН_БОТА') {
+                const tgUrl = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
+                const tgReq = fetch(tgUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ chat_id: TELEGRAM_CHAT_ID, text: leadMessage })
+                }).catch(e => console.error('TG Error:', e));
+                requests.push(tgReq);
+            }
+
+            // 2. Отправка на почту (Web3Forms)
+            if (WEB3FORMS_ACCESS_KEY !== 'ВАШ_КЛЮЧ_WEB3FORMS') {
+                const mailReq = fetch('https://api.web3forms.com/submit', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                    body: JSON.stringify({
+                        access_key: WEB3FORMS_ACCESS_KEY,
+                        subject: 'Новая заявка с интерактивного КП CFO',
+                        from_name: 'Интерактивное КП',
+                        name: name,
+                        email: email, 
+                        phone: phone,
+                        message: leadMessage
+                    })
+                }).catch(e => console.error('Mail Error:', e));
+                requests.push(mailReq);
+            }
+
+            // Ждем завершения всех отправок (или таймаут 2 сек для надежности)
+            if(requests.length > 0) {
+                await Promise.all(requests);
+            } else {
+                // Если ключи не вставлены, просто эмулируем задержку
+                await new Promise(r => setTimeout(r, 1000));
+            }
+            
+            // Переход на экран успеха
             scrResult.classList.add('hidden-screen');
             scrSuccess.classList.remove('hidden-screen');
             window.scrollTo({ top: 0, behavior: 'smooth' });
             
-            setTimeout(() => {
-                console.log("Здесь происходит window.location.href = 'ссылка на calendly'");
-            }, 2000);
+            // Сбрасываем кнопку на всякий случай
+            btnText.textContent = "Забронировать время в календаре";
+            btnLoader.classList.add('hidden');
+            document.getElementById('btn-submit').disabled = false;
         });
     </script>
 </body>
