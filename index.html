@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Интерактивное КП | Финансовый директор</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --primary-dark: #1e3a8a; 
+            --primary-light: #2563eb; 
+            --bg-color: #f8fafc; 
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            overflow-x: hidden;
+            background-image: radial-gradient(circle at 15% 50%, rgba(37, 99, 235, 0.03), transparent 25%),
+                              radial-gradient(circle at 85% 30%, rgba(30, 58, 138, 0.03), transparent 25%);
+        }
+
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+            margin: 15px 0;
+        }
+        input[type=range]:focus { outline: none; }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%; height: 6px; cursor: pointer;
+            background: #e2e8f0; border-radius: 4px;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            height: 28px; width: 28px; border-radius: 50%;
+            background: var(--primary-light); cursor: pointer;
+            -webkit-appearance: none; margin-top: -11px;
+            box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.3);
+            border: 4px solid #fff; transition: transform 0.2s;
+        }
+        input[type=range]::-webkit-slider-thumb:hover {
+            transform: scale(1.1); background: var(--primary-dark);
+        }
+
+        .pain-card {
+            background: var(--card-bg);
+            border: 2px solid #e2e8f0;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+        .pain-card:hover {
+            border-color: #cbd5e1;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+            transform: translateY(-2px);
+        }
+        .pain-card.active {
+            border-color: var(--primary-light);
+            background-color: #eff6ff;
+            box-shadow: 0 0 0 1px var(--primary-light);
+        }
+        .pain-card.active .pain-title {
+            color: var(--primary-dark);
+        }
+
+        .loss-panel {
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+            margin-top: 0;
+        }
+        .loss-panel.visible {
+            max-height: 200px;
+            opacity: 1;
+            margin-top: 1.5rem;
+        }
+        .text-gradient {
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-image: linear-gradient(to right, #ef4444, #991b1b);
+        }
+
+        .trust-star {
+            cursor: pointer; transition: all 0.2s; color: #cbd5e1;
+        }
+        .trust-star.active, .trust-star:hover {
+            color: #fbbf24; transform: scale(1.15);
+        }
+
+        .fade-in { animation: fadeIn 0.4s ease-out forwards; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .hidden-screen { display: none !important; }
+        
+        .loader {
+            border: 3px solid #e2e8f0; border-top: 3px solid var(--primary-light);
+            border-radius: 50%; width: 48px; height: 48px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        .btn-primary {
+            background-color: var(--primary-dark); color: white;
+            transition: background-color 0.3s, transform 0.2s, box-shadow 0.2s;
+        }
+        .btn-primary:hover {
+            background-color: #152c6b;
+            box-shadow: 0 10px 15px -3px rgba(30, 58, 138, 0.3);
+            transform: translateY(-1px);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4 md:p-8">
+
+    <div class="w-full max-w-4xl bg-white rounded-3xl p-6 md:p-12 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.05)] border border-slate-100 relative z-10" id="app-container">
+        
+        <!-- Уведомление о конфиденциальности -->
+        <div class="text-xs text-slate-400 flex items-center gap-2 mb-10 justify-center font-medium bg-slate-50 py-2 px-4 rounded-full max-w-max mx-auto border border-slate-100">
+            <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+            Данные обрабатываются локально. Строгая конфиденциальность.
+        </div>
+
+        <div id="screen-quiz" class="fade-in">
+            <h1 class="text-3xl md:text-5xl font-bold text-center mb-5 text-slate-900 tracking-tight">Нахожу причины потери прибыли, а не <span class="text-blue-600">просто свожу отчеты</span></h1>
+            <p class="text-slate-500 text-center mb-12 text-base md:text-lg max-w-2xl mx-auto">Ответьте на 3 вопроса о вашем бизнесе, чтобы система определила точки потери денег и перестроила решение под вашу задачу.</p>
+
+            <div class="mb-12 bg-white border border-slate-200 p-6 rounded-2xl shadow-sm">
+                <div class="flex justify-between items-end mb-6">
+                    <h2 class="text-xl font-bold text-slate-800">1. Годовая выручка компании</h2>
+                    <span id="revenue-display" class="text-blue-700 font-bold text-xl bg-blue-50 px-3 py-1 rounded-lg">до 50 млн ₽</span>
+                </div>
+                <div class="px-2">
+                    <input type="range" id="revenue-slider" min="0" max="3" value="0" step="1">
+                    <div class="flex justify-between text-xs md:text-sm text-slate-400 mt-3 font-medium">
+                        <span class="w-1/4 text-left">Старт</span>
+                        <span class="w-1/4 text-center">Рост</span>
+                        <span class="w-1/4 text-center">Масштаб</span>
+                        <span class="w-1/4 text-right">Корпорация</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-12">
+                <div class="flex items-center gap-2 mb-6">
+                    <h2 class="text-xl font-bold text-slate-800">2. Что сейчас происходит в бизнесе?</h2>
+                    <span class="text-xs bg-slate-100 text-slate-500 px-2 py-1 rounded">Можно несколько</span>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="pain-container">
+                    
+                    <button class="pain-card text-left p-6 rounded-2xl flex flex-col h-full" data-val="cashgap">
+                        <div class="pain-title font-bold text-lg mb-2 text-slate-800">Кассовые разрывы</div>
+                        <div class="text-sm text-slate-500 leading-relaxed">По отчетам компания работает в плюс, но на счетах пусто. Приходится постоянно искать средства, чтобы вовремя закрыть ФОТ или налоги.</div>
+                    </button>
+                    
+                    <button class="pain-card text-left p-6 rounded-2xl flex flex-col h-full" data-val="profit_drop">
+                        <div class="pain-title font-bold text-lg mb-2 text-slate-800">Снижение прибыли</div>
+                        <div class="text-sm text-slate-500 leading-relaxed">Объемы продаж увеличиваются, команда перегружена, однако финансовый результат на выходе разочаровывает. Рентабельность постепенно падает.</div>
+                    </button>
+                    
+                    <button class="pain-card text-left p-6 rounded-2xl flex flex-col h-full" data-val="hidden_loss">
+                        <div class="pain-title font-bold text-lg mb-2 text-slate-800">Скрытая убыточность</div>
+                        <div class="text-sm text-slate-500 leading-relaxed">Нет четкого понимания себестоимости сделок. Отдельные проекты или неконтролируемые скидки незаметно высасывают деньги из компании.</div>
+                    </button>
+                    
+                    <button class="pain-card text-left p-6 rounded-2xl flex flex-col h-full" data-val="scale_illusion">
+                        <div class="pain-title font-bold text-lg mb-2 text-slate-800">Ловушки масштабирования</div>
+                        <div class="text-sm text-slate-500 leading-relaxed">Открываются новые филиалы и запускаются продукты, оборот красиво растет, но старые прибыльные направления спонсируют новые убыточные инициативы.</div>
+                    </button>
+
+                </div>
+                
+                <!-- Калькулятор визуализации скрытых потерь -->
+                <div id="loss-estimator" class="loss-panel bg-red-50 border border-red-100 rounded-2xl p-6 flex flex-col md:flex-row items-center justify-between gap-4 shadow-inner">
+                    <div>
+                        <div class="flex items-center gap-2 text-red-600 mb-1">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                            <span class="font-bold uppercase tracking-wider text-sm">Оценка скрытых потерь</span>
+                        </div>
+                        <p class="text-sm text-slate-600">Оценочный объем замороженных средств или недополученной прибыли в год (на базе статистики похожих компаний)</p>
+                    </div>
+                    <div class="text-right whitespace-nowrap">
+                        <div class="text-3xl md:text-4xl font-black text-gradient"><span id="loss-amount">0</span> ₽</div>
+                    </div>
+                </div>
+
+                <p id="pain-error" class="text-red-500 text-sm mt-3 hidden font-medium pl-2">Пожалуйста, выберите хотя бы одну проблему</p>
+            </div>
+
+            <div class="mb-12 bg-white border border-slate-200 p-6 rounded-2xl shadow-sm">
+                <h2 class="text-xl font-bold text-slate-800 mb-4">3. Уровень доверия к текущим отчетам (1-5)</h2>
+                <div class="flex gap-3 text-4xl" id="trust-container">
+                    <span class="trust-star" data-val="1">★</span>
+                    <span class="trust-star" data-val="2">★</span>
+                    <span class="trust-star" data-val="3">★</span>
+                    <span class="trust-star" data-val="4">★</span>
+                    <span class="trust-star" data-val="5">★</span>
+                </div>
+                <p class="text-sm text-slate-500 mt-3">1 — Цифрам нельзя верить, 5 — Абсолютная точность и понимание</p>
+                <p id="trust-error" class="text-red-500 text-sm mt-2 hidden font-medium">Пожалуйста, оцените уровень доверия</p>
+            </div>
+
+            <button id="btn-analyze" class="w-full btn-primary font-bold text-lg py-5 rounded-xl shadow-lg">
+                Анализировать ситуацию
+            </button>
+        </div>
+
+        <div id="screen-loading" class="hidden-screen flex-col items-center justify-center py-32">
+            <div class="loader mb-8"></div>
+            <p class="text-slate-600 text-lg font-medium" id="loading-text">Анализ вводных данных...</p>
+        </div>
+
+        <div id="screen-result" class="hidden-screen fade-in">
+            <div class="border-b border-slate-200 pb-8 mb-8">
+                <p class="text-blue-600 font-bold tracking-wide uppercase text-sm mb-2" id="result-subtitle">Индивидуальное решение</p>
+                <h2 class="text-3xl md:text-4xl font-bold mb-4 text-slate-900 leading-tight" id="result-title">Заголовок результата</h2>
+                <p class="text-slate-600 text-lg leading-relaxed" id="result-desc">Описание результата на основе ответов.</p>
+            </div>
+
+            <div class="bg-slate-50 p-6 md:p-8 rounded-2xl mb-10 border-l-4 border-l-blue-600">
+                <div class="flex items-center gap-2 mb-3">
+                    <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    <p class="text-sm text-slate-500 uppercase tracking-wider font-bold">Пример из практики</p>
+                </div>
+                <h3 class="text-xl font-bold text-slate-900 mb-3" id="case-title">Кейс</h3>
+                <p class="text-base text-slate-600 mb-4 leading-relaxed" id="case-desc">Описание кейса</p>
+                <div class="inline-block bg-white border border-slate-200 px-4 py-2 rounded-lg shadow-sm">
+                    <span class="text-blue-700 font-bold text-sm" id="case-result">Эффект: +X%</span>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 md:p-8 rounded-2xl border border-slate-200 shadow-lg relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-32 h-32 bg-blue-50 rounded-bl-full -z-10"></div>
+                
+                <h3 class="text-2xl font-bold mb-3 text-slate-900">Бесплатная экспресс-диагностика</h3>
+                <p class="text-base text-slate-600 mb-6 leading-relaxed">По итогам 30-минутной видеовстречи вы получите <b>карту приоритетных рисков</b> и 2-3 гипотезы, где конкретно сейчас заморожены деньги вашей компании.</p>
+                
+                <div class="space-y-4">
+                    <input type="text" id="form-name" placeholder="Ваше имя" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-5 py-4 text-slate-900 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all">
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <input type="tel" id="form-phone" placeholder="+7 (___) ___-__-__" maxlength="18" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-5 py-4 text-slate-900 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all">
+                        <input type="email" id="form-email" placeholder="Электронная почта" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-5 py-4 text-slate-900 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all">
+                    </div>
+                    
+                    <p id="form-error" class="text-red-500 text-sm hidden font-medium pl-1">Пожалуйста, корректно заполните email и телефон</p>
+                    
+                    <button id="btn-submit" class="w-full btn-primary font-bold py-4 rounded-xl mt-2 text-lg flex justify-center items-center gap-2">
+                        Забронировать время в календаре
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                    </button>
+
+                    <p class="text-xs text-slate-400 text-center mt-3 leading-tight">
+                        Нажимая кнопку, вы соглашаетесь с <a href="#" class="underline hover:text-slate-600 transition-colors">Политикой конфиденциальности</a> и даете <a href="#" class="underline hover:text-slate-600 transition-colors">согласие на обработку персональных данных</a>.
+                    </p>
+
+                    <div class="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-6 mt-5 text-xs font-medium text-slate-500">
+                        <span class="flex items-center gap-1"><svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Встреча лично с Ириной Воеводиной</span>
+                        <span class="flex items-center gap-1"><svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Без агрессивных продаж</span>
+                    </div>
+                </div>
+            </div>
+            
+            <button id="btn-magnet" class="mt-6 w-full text-center text-sm font-medium text-blue-600 hover:text-blue-800 underline transition-colors">
+                Пока не готовы к встрече? Получите чек-лист: «5 скрытых причин потери прибыли»
+            </button>
+            
+            <button id="btn-back" class="mt-8 text-sm font-medium text-slate-400 hover:text-slate-600 transition-colors w-full text-center flex items-center justify-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                Вернуться к анкете
+            </button>
+        </div>
+
+        <div id="screen-success" class="hidden-screen fade-in text-center py-16">
+            <div class="w-24 h-24 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-6 border-8 border-white shadow-sm">
+                <svg class="w-10 h-10 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+            </div>
+            <h2 class="text-3xl font-bold mb-4 text-slate-900">Перенаправляем в календарь...</h2>
+            <p class="text-slate-600 text-lg mb-8 max-w-md mx-auto">Пожалуйста, выберите удобное время для онлайн-встречи на открывшейся странице виджета.</p>
+            <button class="btn-primary font-bold py-3 px-8 rounded-xl shadow-lg" onclick="alert('Демо: Здесь откроется виджет Calendly или Yandex Телемост')">Открыть календарь вручную</button>
+        </div>
+
+    </div>
+
+    <script>
+        const state = {
+            revenueIndex: 0,
+            pains: [],
+            trust: null,
+            painNames: []
+        };
+
+        const revenueLabels = {
+            0: "до 50 млн ₽",
+            1: "50–200 млн ₽",
+            2: "200–500 млн ₽",
+            3: "более 500 млн ₽"
+        };
+        
+        const revenueBaseMap = { 0: 30, 1: 125, 2: 350, 3: 750 };
+
+        const painMultipliers = {
+            'cashgap': 0.08,
+            'profit_drop': 0.05,
+            'hidden_loss': 0.06,
+            'scale_illusion': 0.04
+        };
+
+        const elSlider = document.getElementById('revenue-slider');
+        const elRevenueDisplay = document.getElementById('revenue-display');
+        const elPainBtns = document.querySelectorAll('.pain-card');
+        const elTrustStars = document.querySelectorAll('.trust-star');
+        const elLossEstimator = document.getElementById('loss-estimator');
+        const elLossAmount = document.getElementById('loss-amount');
+        
+        const scrQuiz = document.getElementById('screen-quiz');
+        const scrLoading = document.getElementById('screen-loading');
+        const scrResult = document.getElementById('screen-result');
+        const scrSuccess = document.getElementById('screen-success');
+        
+        const animateValue = (obj, start, end, duration) => {
+            let startTimestamp = null;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                const easeOut = 1 - Math.pow(1 - progress, 3);
+                const currentVal = Math.floor(easeOut * (end - start) + start);
+                
+                obj.innerHTML = "до " + currentVal.toLocaleString('ru-RU');
+                
+                if (progress < 1) window.requestAnimationFrame(step);
+            };
+            window.requestAnimationFrame(step);
+        };
+
+        const calculateLosses = () => {
+            if(state.pains.length === 0) {
+                elLossEstimator.classList.remove('visible');
+                return;
+            }
+            
+            elLossEstimator.classList.add('visible');
+            const baseRevenue = revenueBaseMap[state.revenueIndex] * 1000000; 
+            let totalMultiplier = 0;
+            
+            state.pains.forEach(pain => {
+                totalMultiplier += painMultipliers[pain];
+            });
+            
+            const estimatedLoss = baseRevenue * totalMultiplier;
+            animateValue(elLossAmount, 0, estimatedLoss, 1000);
+        };
+
+        elSlider.addEventListener('input', (e) => {
+            state.revenueIndex = parseInt(e.target.value);
+            elRevenueDisplay.textContent = revenueLabels[state.revenueIndex];
+            calculateLosses(); 
+        });
+
+        elPainBtns.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const target = e.currentTarget; 
+                const val = target.dataset.val;
+                const name = target.querySelector('.pain-title').textContent.toLowerCase();
+                
+                if (state.pains.includes(val)) {
+                    state.pains = state.pains.filter(p => p !== val);
+                    state.painNames = state.painNames.filter(n => n !== name);
+                    target.classList.remove('active');
+                } else {
+                    state.pains.push(val);
+                    state.painNames.push(name);
+                    target.classList.add('active');
+                }
+                
+                calculateLosses(); 
+                
+                if (state.pains.length > 0) {
+                    document.getElementById('pain-error').classList.add('hidden');
+                }
+            });
+        });
+
+        elTrustStars.forEach(star => {
+            star.addEventListener('click', (e) => {
+                const val = parseInt(e.target.dataset.val);
+                state.trust = val;
+                elTrustStars.forEach(s => {
+                    if(parseInt(s.dataset.val) <= val) s.classList.add('active');
+                    else s.classList.remove('active');
+                });
+                document.getElementById('trust-error').classList.add('hidden');
+            });
+        });
+
+        const generateResult = () => {
+            const elSubtitle = document.getElementById('result-subtitle');
+            const elTitle = document.getElementById('result-title');
+            const elDesc = document.getElementById('result-desc');
+            const elCaseTitle = document.getElementById('case-title');
+            const elCaseDesc = document.getElementById('case-desc');
+            const elCaseResult = document.getElementById('case-result');
+
+            let recommendedProduct = "";
+            let description = "";
+
+            let painText = state.painNames.length > 0 ? state.painNames[0] : "финансовых проблем";
+            elSubtitle.textContent = `Для бизнеса с выручкой ${revenueLabels[state.revenueIndex]} и проблемой: ${painText}`;
+
+            if (state.revenueIndex === 0 || state.revenueIndex === 1) { 
+                recommendedProduct = "Диагностика экономики бизнеса";
+                description = "Для бизнеса с вашим масштабом важно выстроить правильную архитектуру финансов. Я предлагаю начать с экспресс-диагностики, чтобы понять, целесообразно ли сейчас внедрять сложные инструменты или достаточно базовой настройки, чтобы не терять деньги.";
+            } else { 
+                if (state.pains.includes('cashgap')) {
+                    recommendedProduct = "Финансовая стабилизация бизнеса";
+                    description = "Регулярные кассовые разрывы на ваших оборотах критичны. Нам необходимо построить краткосрочный денежный прогноз, определить источники разрывов и реализовать план по быстрому высвобождению замороженных средств.";
+                } else if (state.pains.includes('profit_drop') || state.pains.includes('hidden_loss') || state.pains.includes('scale_illusion')) {
+                    recommendedProduct = "Поиск резервов прибыли и денег";
+                    description = "Выручка есть, а деньги исчезают. Мы найдем зоны скрытых потерь, свяжем финансовые показатели с операционной деятельностью и определим, на какие факторы мы реально можем воздействовать для кратного роста рентабельности.";
+                } else {
+                    recommendedProduct = "Управленческая аналитика";
+                    description = "Существующая отчётность не объясняет ситуацию, и вы принимаете решения вслепую. Мы перестроим аналитику так, чтобы она показывала первопричины, а не только фиксировала план-факт.";
+                }
+            }
+
+            if (state.pains.includes('cashgap')) {
+                elCaseTitle.textContent = "Разморозка денег из запасов";
+                elCaseDesc.textContent = "Анализ показал, что план производства систематически превышал фактический спрос. Мы скорректировали выпуск и остановили заморозку оборотных средств на складах.";
+                elCaseResult.textContent = "Эффект: Быстрое закрытие кредита";
+            } else if (state.pains.includes('hidden_loss') || state.pains.includes('scale_illusion')) {
+                elCaseTitle.textContent = "Закрытие убыточных проектов";
+                elCaseDesc.textContent = "В строительной группе внедрена аналитика по проектам. Выявлены и закрыты направления, которые казались перспективными, но фактически съедали общую маржу.";
+                elCaseResult.textContent = "Эффект: Чистая прибыль выросла на 9% за год";
+            } else {
+                elCaseTitle.textContent = "От фиксации факта к управлению";
+                elCaseDesc.textContent = "Собственник производственной компании получал только «посмертный» учет. Мы внедрили факторный анализ для понимания истинных причин отклонений.";
+                elCaseResult.textContent = "Эффект: Решения на цифрах, а не на интуиции";
+            }
+
+            elTitle.textContent = recommendedProduct;
+            elDesc.textContent = description;
+        };
+
+        document.getElementById('btn-analyze').addEventListener('click', () => {
+            let valid = true;
+            if (state.pains.length === 0) {
+                document.getElementById('pain-error').classList.remove('hidden');
+                valid = false;
+            }
+            if (!state.trust) {
+                document.getElementById('trust-error').classList.remove('hidden');
+                valid = false;
+            }
+            if (!valid) return;
+
+            scrQuiz.classList.add('hidden-screen');
+            scrLoading.classList.remove('hidden-screen');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            
+            const loadingTexts = ["Анализ вводных данных...", "Связываем финансовые факторы...", "Оценка потенциальных потерь...", "Подбор релевантных решений..."];
+            let idx = 0;
+            const textInterval = setInterval(() => {
+                idx++;
+                if(idx < loadingTexts.length) {
+                    document.getElementById('loading-text').textContent = loadingTexts[idx];
+                }
+            }, 600);
+
+            setTimeout(() => {
+                clearInterval(textInterval);
+                generateResult();
+                scrLoading.classList.add('hidden-screen');
+                scrResult.classList.remove('hidden-screen');
+            }, 2500);
+        });
+
+        document.getElementById('btn-back').addEventListener('click', () => {
+            scrResult.classList.add('hidden-screen');
+            scrQuiz.classList.remove('hidden-screen');
+            document.getElementById('loading-text').textContent = "Анализ вводных данных...";
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+        
+        document.getElementById('btn-magnet').addEventListener('click', () => {
+            const email = prompt("Укажите ваш email, и мы сразу отправим чек-лист:");
+            if(email && email.includes('@')) {
+                alert("Чек-лист успешно отправлен на " + email);
+            }
+        });
+
+        const phoneInput = document.getElementById('form-phone');
+
+        const getInputNumbersValue = (input) => {
+            return input.value.replace(/\D/g, '');
+        }
+
+        const onPhonePaste = (e) => {
+            let input = e.target,
+                inputNumbersValue = getInputNumbersValue(input);
+            let pasted = e.clipboardData || window.clipboardData;
+            if (pasted) {
+                let pastedText = pasted.getData('Text');
+                if (/\D/g.test(pastedText)) {
+                    input.value = inputNumbersValue;
+                    return;
+                }
+            }
+        }
+
+        const onPhoneInput = (e) => {
+            let input = e.target,
+                inputNumbersValue = getInputNumbersValue(input),
+                selectionStart = input.selectionStart,
+                formattedInputValue = "";
+
+            if (!inputNumbersValue) {
+                return input.value = "";
+            }
+
+            if (input.value.length != selectionStart) {
+                if (e.data && /\D/g.test(e.data)) {
+                    input.value = inputNumbersValue;
+                }
+                return;
+            }
+
+            if (["7", "8", "9"].indexOf(inputNumbersValue[0]) > -1) {
+                if (inputNumbersValue[0] == "9") inputNumbersValue = "7" + inputNumbersValue;
+                let firstSymbols = (inputNumbersValue[0] == "8") ? "8" : "+7";
+                formattedInputValue = input.value = firstSymbols + " ";
+                if (inputNumbersValue.length > 1) {
+                    formattedInputValue += '(' + inputNumbersValue.substring(1, 4);
+                }
+                if (inputNumbersValue.length >= 5) {
+                    formattedInputValue += ') ' + inputNumbersValue.substring(4, 7);
+                }
+                if (inputNumbersValue.length >= 8) {
+                    formattedInputValue += '-' + inputNumbersValue.substring(7, 9);
+                }
+                if (inputNumbersValue.length >= 10) {
+                    formattedInputValue += '-' + inputNumbersValue.substring(9, 11);
+                }
+            } else {
+                formattedInputValue = '+' + inputNumbersValue.substring(0, 16);
+            }
+            input.value = formattedInputValue;
+        }
+        
+        const onPhoneKeyDown = (e) => {
+            let inputValue = e.target.value.replace(/\D/g, '');
+            if (e.keyCode == 8 && inputValue.length == 1) {
+                e.target.value = "";
+            }
+        }
+
+        phoneInput.addEventListener('keydown', onPhoneKeyDown);
+        phoneInput.addEventListener('input', onPhoneInput, false);
+        phoneInput.addEventListener('paste', onPhonePaste, false);
+
+        document.getElementById('btn-submit').addEventListener('click', () => {
+            const name = document.getElementById('form-name').value.trim();
+            const phone = document.getElementById('form-phone').value.trim();
+            const email = document.getElementById('form-email').value.trim();
+            const errorEl = document.getElementById('form-error');
+            
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            const phoneClean = getInputNumbersValue(document.getElementById('form-phone'));
+            const isPhoneValid = phoneClean.length === 11 && (phoneClean.startsWith('7') || phoneClean.startsWith('8'));
+            
+            if(!name || !isPhoneValid || !emailRegex.test(email)) {
+                errorEl.classList.remove('hidden');
+                return;
+            } else {
+                errorEl.classList.add('hidden');
+            }
+            
+            scrResult.classList.add('hidden-screen');
+            scrSuccess.classList.remove('hidden-screen');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            
+            setTimeout(() => {
+                console.log("Здесь происходит window.location.href = 'ссылка на calendly'");
+            }, 2000);
+        });
+    </script>
+</body>
+</html>
